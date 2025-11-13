@@ -1,0 +1,23 @@
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  color: #2e7d32;
+  margin-bottom: 20px;
+}
+
+/* RTL Support */
+:host-context([dir="rtl"]) .app-container {
+  direction: rtl;
+  text-align: right;
+}
+
+:host-context([dir="ltr"]) .app-container {
+  direction: ltr;
+  text-align: left;
+}

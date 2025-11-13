@@ -1,0 +1,79 @@
+.tree-node {
+  margin: 8px 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.node-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.node-content:hover {
+  background-color: #f0f0f0;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 8px;
+  color: #333;
+  min-width: 20px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.expand-btn:hover {
+  color: #0066cc;
+}
+
+.no-children-placeholder {
+  min-width: 20px;
+  text-align: center;
+  color: #ccc;
+}
+
+.prophet-info {
+  cursor: pointer;
+  flex: 1;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.prophet-info:hover {
+  background-color: #e6f2ff;
+}
+
+.prophet-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0066cc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arabic-name {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.prophet-era {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: #999;
+}
+
+.children {
+  border-left: 2px solid #ddd;
+  margin-left: 8px;
+  padding-left: 8px;
+}

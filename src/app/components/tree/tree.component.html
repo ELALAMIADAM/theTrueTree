@@ -1,0 +1,23 @@
+<div class="tree-container">
+  <div class="tree-main">
+    <h2>{{ translate('selectProphet') }}</h2>
+    <app-tree-node 
+      *ngIf="prophetTree"
+      [prophet]="prophetTree"
+      (prophetSelected)="onProphetSelected($event)">
+    </app-tree-node>
+  </div>
+
+  <div class="tree-details">
+    <h2>{{ translate('selectProphet') }}</h2>
+    <div *ngIf="selectedProphet" class="prophet-details">
+      <p><strong>{{ translate('name') }}:</strong> {{ selectedProphet.name }}</p>
+      <p *ngIf="selectedProphet.arabicName"><strong>{{ translate('arabicName') }}:</strong> {{ selectedProphet.arabicName }}</p>
+      <p><strong>{{ translate('era') }}:</strong> {{ selectedProphet.era }}</p>
+      <p><strong>{{ translate('description') }}:</strong> {{ selectedProphet.description }}</p>
+    </div>
+    <div *ngIf="!selectedProphet" class="no-selection">
+      {{ translate('noSelection') }}
+    </div>
+  </div>
+</div>

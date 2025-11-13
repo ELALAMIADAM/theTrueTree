@@ -1,0 +1,23 @@
+<div class="tree-node">
+  <div class="node-content">
+    <button 
+      *ngIf="hasChildren()" 
+      class="expand-btn" 
+      (click)="toggleExpand()">
+      {{ isExpanded ? '▼' : '▶' }}
+    </button>
+    <span 
+      class="prophet-name" 
+      (click)="selectProphet()">
+      {{ prophet.name }}
+    </span>
+  </div>
+
+  <div class="node-children" *ngIf="isExpanded && hasChildren()">
+    <app-tree-node 
+      *ngFor="let child of prophet.children"
+      [prophet]="child"
+      (prophetSelected)="prophetSelected.emit($event)">
+    </app-tree-node>
+  </div>
+</div>
