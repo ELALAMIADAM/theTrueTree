@@ -42,6 +42,10 @@ export class TranslationService {
     return this.currentLanguage.value;
   }
 
+  getCurrentLanguage(): 'en' | 'ar' {
+    return this.currentLanguage.value;
+  }
+
   translate(key: string): string {
     const lang = this.currentLanguage.value;
     return (this.translations[lang] as any)[key] || key;

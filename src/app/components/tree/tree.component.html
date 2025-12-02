@@ -1,23 +1,296 @@
-<div class="tree-container">
-  <div class="tree-main">
-    <h2>{{ translate('selectProphet') }}</h2>
-    <app-tree-node 
-      *ngIf="prophetTree"
-      [prophet]="prophetTree"
-      (prophetSelected)="onProphetSelected($event)">
-    </app-tree-node>
+<div class="tree-wrapper">
+  <!-- Header -->
+  <div class="tree-header">
+    <h1 class="tree-title">
+      <span class="title-english">Islamic Prophets Tree</span>
+      <span class="title-arabic">شجرة الأنبياء</span>
+    </h1>
+    <p class="tree-subtitle">From Adam (عليه السلام) at the bottom to Muhammad ﷺ at the top</p>
   </div>
 
-  <div class="tree-details">
-    <h2>{{ translate('selectProphet') }}</h2>
-    <div *ngIf="selectedProphet" class="prophet-details">
-      <p><strong>{{ translate('name') }}:</strong> {{ selectedProphet.name }}</p>
-      <p *ngIf="selectedProphet.arabicName"><strong>{{ translate('arabicName') }}:</strong> {{ selectedProphet.arabicName }}</p>
-      <p><strong>{{ translate('era') }}:</strong> {{ selectedProphet.era }}</p>
-      <p><strong>{{ translate('description') }}:</strong> {{ selectedProphet.description }}</p>
+  <!-- SVG Tree Visualization -->
+  <div class="tree-canvas-wrapper">
+    <svg 
+      class="tree-canvas" 
+      [attr.width]="width" 
+      [attr.height]="height"
+      [attr.viewBox]="'0 0 ' + width + ' ' + height">
+      
+      <!-- Defs for gradients and patterns -->
+      <defs>
+        <linearGradient id="linkGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#3498DB;stop-opacity:0.3" />
+          <stop offset="100%" style="stop-color:#2ECC71;stop-opacity:0.3" />
+        </linearGradient>
+        
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        
+        <pattern id="islamicPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M0,10 L10,0 L20,10 L10,20 Z" fill="none" stroke="#e0e0e0" stroke-width="0.5" opacity="0.3"/>
+        </pattern>
+      </defs>
+
+      <!-- Background pattern -->
+      <rect width="100%" height="100%" fill="url(#islamicPattern)"/>
+      
+      <!-- Links between prophets -->
+      <g class="links">
+        <path 
+          *ngFor="let link of treeLinks"
+          [attr.d]="getLinkPath(link)"
+          class="prophet-link"
+          [class.highlighted]="hoveredProphet && (hoveredProphet.id === link.from.prophet.id || hoveredProphet.id === link.to.prophet.id)"
+          stroke="url(#linkGradient)"
+          stroke-width="2"
+          fill="none"
+          opacity="0.6">
+        </path>
+      </g>
+      
+      <!-- Prophet nodes -->
+      <g class="nodes">
+        <g 
+          *ngFor="let node of treeNodes"
+          class="prophet-node"
+          [class.hovered]="hoveredProphet?.id === node.prophet.id"
+          [class.selected]="selectedProphet?.id === node.prophet.id"
+          (mouseenter)="onProphetHover($event, node.prophet)"
+          (mouseleave)="onProphetLeave()"
+          (click)="onProphetClick(node.prophet)"
+          style="cursor: pointer;">
+          
+          <!-- Outer glow circle -->
+          <circle 
+            [attr.cx]="node.x" 
+            [attr.cy]="node.y" 
+            [attr.r]="NODE_RADIUS + 5"
+            [attr.fill]="getNodeColor(node.prophet)"
+            opacity="0.2"
+            class="node-glow">
+          </circle>
+          
+          <!-- Main circle -->
+          <circle 
+            [attr.cx]="node.x" 
+            [attr.cy]="node.y" 
+            [attr.r]="NODE_RADIUS"
+            [attr.fill]="getNodeColor(node.prophet)"
+            stroke="#fff"
+            stroke-width="3"
+            class="node-circle"
+            filter="url(#glow)">
+          </circle>
+          
+          <!-- Prophet name -->
+          <text 
+            [attr.x]="node.x" 
+            [attr.y]="node.y - NODE_RADIUS - 15"
+            text-anchor="middle"
+            class="node-name"
+            fill="#2C3E50"
+            font-size="14"
+            font-weight="600">
+            {{ getProphetName(node.prophet) }}
+          </text>
+          
+          <!-- Special marker for Muhammad ﷺ -->
+          <text 
+            *ngIf="node.prophet.id === 25"
+            [attr.x]="node.x" 
+            [attr.y]="node.y + 5"
+            text-anchor="middle"
+            class="node-icon"
+            fill="#fff"
+            font-size="24"
+            font-weight="bold">
+            ﷺ
+          </text>
+          
+          <!-- Icon for other prophets -->
+          <text 
+            *ngIf="node.prophet.id !== 25"
+            [attr.x]="node.x" 
+            [attr.y]="node.y + 5"
+            text-anchor="middle"
+            class="node-icon"
+            fill="#fff"
+            font-size="20">
+            ★
+          </text>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Hover Info Card -->
+  <div 
+    *ngIf="hoveredProphet" 
+    class="hover-card"
+    [style.left.px]="hoverX + 20"
+    [style.top.px]="hoverY - 50">
+    <div class="hover-card-content">
+      <h3 class="hover-name">
+        {{ hoveredProphet.name }}
+        <span class="hover-arabic">{{ hoveredProphet.arabicName }}</span>
+      </h3>
+      <p class="hover-era">
+        <strong>Era:</strong> {{ hoveredProphet.era }}
+      </p>
+      <p class="hover-location" *ngIf="hoveredProphet.locationSent">
+        <strong>Location:</strong> {{ hoveredProphet.locationSent }}
+      </p>
+      <p class="hover-hint">Click for more details</p>
     </div>
-    <div *ngIf="!selectedProphet" class="no-selection">
-      {{ translate('noSelection') }}
+  </div>
+
+  <!-- Detailed Modal -->
+  <div *ngIf="showModal && selectedProphet" class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeModal()">&times;</button>
+      
+      <div class="modal-header">
+        <h2 class="modal-title">
+          {{ selectedProphet.name }}
+          <span class="modal-arabic">{{ selectedProphet.arabicName }}</span>
+        </h2>
+        <div class="modal-meta">
+          <span class="meta-item" *ngIf="selectedProphet.era">
+            <strong>Era:</strong> {{ selectedProphet.era }}
+          </span>
+          <span class="meta-item" *ngIf="selectedProphet.lifeSpan">
+            <strong>Life:</strong> {{ selectedProphet.lifeSpan }}
+          </span>
+          <span class="meta-item" *ngIf="selectedProphet.locationSent">
+            <strong>Location:</strong> {{ selectedProphet.locationSent }}
+          </span>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <!-- Description -->
+        <section class="modal-section">
+          <h3 class="section-title">
+            <span class="icon">📖</span> Description
+          </h3>
+          <p class="description-text">{{ selectedProphet.description }}</p>
+        </section>
+
+        <!-- Scripture -->
+        <section class="modal-section" *ngIf="selectedProphet.scripture">
+          <h3 class="section-title">
+            <span class="icon">📜</span> Scripture
+          </h3>
+          <p class="scripture-text">{{ selectedProphet.scripture }}</p>
+        </section>
+
+        <!-- Major Events -->
+        <section class="modal-section" *ngIf="selectedProphet.majorEvents && selectedProphet.majorEvents.length > 0">
+          <h3 class="section-title">
+            <span class="icon">⭐</span> Major Events
+          </h3>
+          <ul class="events-list">
+            <li *ngFor="let event of selectedProphet.majorEvents">{{ event }}</li>
+          </ul>
+        </section>
+
+        <!-- Miracles -->
+        <section class="modal-section" *ngIf="selectedProphet.miracles && selectedProphet.miracles.length > 0">
+          <h3 class="section-title">
+            <span class="icon">✨</span> Miracles
+          </h3>
+          <ul class="miracles-list">
+            <li *ngFor="let miracle of selectedProphet.miracles">{{ miracle }}</li>
+          </ul>
+        </section>
+
+        <!-- Quranic References -->
+        <section class="modal-section" *ngIf="(selectedProphet.resources?.quranRefs?.length ?? 0) > 0">
+          <h3 class="section-title">
+            <span class="icon">📗</span> Quranic References
+          </h3>
+          <div class="quran-refs">
+            <span *ngFor="let ref of selectedProphet.resources?.quranRefs!" class="quran-ref">
+              {{ ref }}
+            </span>
+          </div>
+        </section>
+
+        <!-- Video Resources -->
+        <section class="modal-section" *ngIf="(selectedProphet.resources?.videos?.length ?? 0) > 0">
+          <h3 class="section-title">
+            <span class="icon">🎥</span> Learn More (Videos)
+          </h3>
+          <div class="resources-list">
+            <a 
+              *ngFor="let video of selectedProphet.resources?.videos!" 
+              [href]="video.url" 
+              target="_blank"
+              class="resource-link video-link">
+              <span class="resource-icon">▶️</span>
+              <div class="resource-info">
+                <div class="resource-title">{{ video.title }}</div>
+                <div class="resource-creator" *ngIf="video.creator">{{ video.creator }}</div>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- Book Resources -->
+        <section class="modal-section" *ngIf="(selectedProphet.resources?.books?.length ?? 0) > 0">
+          <h3 class="section-title">
+            <span class="icon">📚</span> Recommended Books
+          </h3>
+          <div class="books-list">
+            <div *ngFor="let book of selectedProphet.resources?.books!" class="book-item">
+              <div class="book-title">{{ book.title }}</div>
+              <div class="book-author" *ngIf="book.author">by {{ book.author }}</div>
+              <div class="book-description" *ngIf="book.description">{{ book.description }}</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-youtube" (click)="openYouTube(selectedProphet)">
+          🎥 Search on YouTube
+        </button>
+        <button class="btn-close-modal" (click)="closeModal()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <h3>Lineage Colors</h3>
+    <div class="legend-items">
+      <div class="legend-item">
+        <span class="legend-color" style="background: #8B4513;"></span>
+        <span>Adam (Father of Humanity)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background: #2ECC71;"></span>
+        <span>Ishmael's Lineage (Arab Prophets)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background: #3498DB;"></span>
+        <span>Isaac's Lineage (Bani Israel)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background: #9B59B6;"></span>
+        <span>Direct Descendants of Noah</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-color" style="background: #FFD700;"></span>
+        <span>Muhammad ﷺ (Seal of Prophets)</span>
+      </div>
     </div>
   </div>
 </div>
