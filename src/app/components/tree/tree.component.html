@@ -5,7 +5,6 @@
       <span class="title-english">Islamic Prophets Tree</span>
       <span class="title-arabic">شجرة الأنبياء</span>
     </h1>
-    <p class="tree-subtitle">From Adam (عليه السلام) at the bottom to Muhammad ﷺ at the top</p>
   </div>
 
   <!-- SVG Tree Visualization -->
@@ -39,7 +38,16 @@
       <!-- Background pattern -->
       <rect width="100%" height="100%" fill="url(#islamicPattern)"/>
       
-      <!-- Links between prophets -->
+      <!-- Tree Trunk -->
+      <path 
+        [attr.d]="getTrunkPath()" 
+        fill="#8B4513"
+        stroke="#654321"
+        stroke-width="2"
+        class="tree-trunk">
+      </path>
+      
+      <!-- Links between prophets (branches) -->
       <g class="links">
         <path 
           *ngFor="let link of treeLinks"
@@ -65,89 +73,252 @@
           (click)="onProphetClick(node.prophet)"
           style="cursor: pointer;">
           
-          <!-- Outer glow circle -->
-          <circle 
-            [attr.cx]="node.x" 
-            [attr.cy]="node.y" 
-            [attr.r]="NODE_RADIUS + 5"
-            [attr.fill]="getNodeColor(node.prophet)"
-            opacity="0.2"
-            class="node-glow">
-          </circle>
+          <!-- Special design for Adam (Father of Humanity) -->
+          <g *ngIf="node.prophet.id === 1">
+            <!-- Large outer circle (earth/ground) -->
+            <circle [attr.cx]="node.x" [attr.cy]="node.y" [attr.r]="55" 
+                    fill="#8B4513" stroke="#654321" stroke-width="4" opacity="0.6"/>
+            <!-- Middle circle -->
+            <circle [attr.cx]="node.x" [attr.cy]="node.y" [attr.r]="48" 
+                    fill="#A0522D" stroke="#654321" stroke-width="3" opacity="0.8"/>
+            <!-- Decorative ring -->
+            <circle [attr.cx]="node.x" [attr.cy]="node.y" [attr.r]="42" 
+                    fill="none" stroke="#FFD700" stroke-width="2" stroke-dasharray="5,3"/>
+          </g>
           
-          <!-- Main circle -->
+          <!-- Special design for Abraham (Father of Prophets) - id: 6 -->
+          <g *ngIf="node.prophet.id === 6">
+            <!-- Outer star points -->
+            <path [attr.d]="getStarPath(node.x, node.y, 50, 25, 8)" 
+                  fill="#9370DB" stroke="#6A5ACD" stroke-width="3" opacity="0.8"/>
+            <!-- Inner glow circle -->
+            <circle [attr.cx]="node.x" [attr.cy]="node.y" [attr.r]="42" 
+                    fill="#BA55D3" stroke="#9370DB" stroke-width="2" opacity="0.9"/>
+          </g>
+          
+          <!-- Special design for Noah (Ark Builder) - id: 3 -->
+          <g *ngIf="node.prophet.id === 3">
+            <!-- Water waves -->
+            <path [attr.d]="'M ' + (node.x - 45) + ' ' + (node.y + 20) + ' Q ' + (node.x - 30) + ' ' + (node.y + 10) + ' ' + (node.x - 15) + ' ' + (node.y + 20) + ' T ' + (node.x + 15) + ' ' + (node.y + 20) + ' T ' + (node.x + 45) + ' ' + (node.y + 20)" 
+                  fill="none" stroke="#4682B4" stroke-width="3" opacity="0.8"/>
+            <path [attr.d]="'M ' + (node.x - 45) + ' ' + (node.y + 30) + ' Q ' + (node.x - 30) + ' ' + (node.y + 20) + ' ' + (node.x - 15) + ' ' + (node.y + 30) + ' T ' + (node.x + 15) + ' ' + (node.y + 30) + ' T ' + (node.x + 45) + ' ' + (node.y + 30)" 
+                  fill="none" stroke="#5F9EA0" stroke-width="3" opacity="0.7"/>
+            <!-- Boat shape -->
+            <ellipse [attr.cx]="node.x" [attr.cy]="node.y - 10" [attr.rx]="45" [attr.ry]="35" 
+                     fill="#4169E1" stroke="#1E90FF" stroke-width="3" opacity="0.9"/>
+          </g>
+          
+          <!-- Special design for Moses (Torah) - id: 15 -->
+          <g *ngIf="node.prophet.id === 15">
+            <!-- Tablets shape (two rectangles) -->
+            <rect [attr.x]="node.x - 45" [attr.y]="node.y - 30" width="35" height="50" 
+                  fill="#DAA520" stroke="#B8860B" stroke-width="3" rx="5" opacity="0.9"/>
+            <rect [attr.x]="node.x + 10" [attr.y]="node.y - 30" width="35" height="50" 
+                  fill="#DAA520" stroke="#B8860B" stroke-width="3" rx="5" opacity="0.9"/>
+            <!-- Lines representing commandments -->
+            <line [attr.x1]="node.x - 35" [attr.y1]="node.y - 20" [attr.x2]="node.x - 15" [attr.y2]="node.y - 20" 
+                  stroke="#8B4513" stroke-width="2"/>
+            <line [attr.x1]="node.x - 35" [attr.y1]="node.y - 10" [attr.x2]="node.x - 15" [attr.y2]="node.y - 10" 
+                  stroke="#8B4513" stroke-width="2"/>
+            <line [attr.x1]="node.x + 20" [attr.y1]="node.y - 20" [attr.x2]="node.x + 40" [attr.y2]="node.y - 20" 
+                  stroke="#8B4513" stroke-width="2"/>
+            <line [attr.x1]="node.x + 20" [attr.y1]="node.y - 10" [attr.x2]="node.x + 40" [attr.y2]="node.y - 10" 
+                  stroke="#8B4513" stroke-width="2"/>
+          </g>
+          
+          <!-- Special design for Jesus (Cross & Light) - id: 24 -->
+          <g *ngIf="node.prophet.id === 24">
+            <!-- Radiant light rays -->
+            <line *ngFor="let angle of [0, 45, 90, 135, 180, 225, 270, 315]"
+                  [attr.x1]="node.x + Math.cos(angle * Math.PI / 180) * 35"
+                  [attr.y1]="node.y + Math.sin(angle * Math.PI / 180) * 35"
+                  [attr.x2]="node.x + Math.cos(angle * Math.PI / 180) * 50"
+                  [attr.y2]="node.y + Math.sin(angle * Math.PI / 180) * 50"
+                  stroke="#87CEEB"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  opacity="0.8">
+            </line>
+            <!-- Cross -->
+            <rect [attr.x]="node.x - 3" [attr.y]="node.y - 25" width="6" height="50" 
+                  fill="#CD853F" stroke="#8B4513" stroke-width="2" rx="2"/>
+            <rect [attr.x]="node.x - 20" [attr.y]="node.y - 3" width="40" height="6" 
+                  fill="#CD853F" stroke="#8B4513" stroke-width="2" rx="2"/>
+          </g>
+          
+          <!-- Flower petals (for regular prophets) -->
+          <g *ngIf="node.prophet.id !== 25 && node.prophet.id !== 1 && node.prophet.id !== 6 && node.prophet.id !== 3 && node.prophet.id !== 15 && node.prophet.id !== 24">
+            <!-- Petal 1 (top) -->
+            <ellipse [attr.cx]="node.x" [attr.cy]="node.y - 25" [attr.rx]="12" [attr.ry]="18" 
+                     fill="#FFB6C1" stroke="#FF69B4" stroke-width="2" opacity="0.9"/>
+            <!-- Petal 2 (top-right) -->
+            <ellipse [attr.cx]="node.x + 22" [attr.cy]="node.y - 12" [attr.rx]="12" [attr.ry]="18" 
+                     fill="#FFB6C1" stroke="#FF69B4" stroke-width="2" opacity="0.9" 
+                     [attr.transform]="'rotate(72 ' + node.x + ' ' + node.y + ')'"/>
+            <!-- Petal 3 (bottom-right) -->
+            <ellipse [attr.cx]="node.x + 14" [attr.cy]="node.y + 20" [attr.rx]="12" [attr.ry]="18" 
+                     fill="#FFB6C1" stroke="#FF69B4" stroke-width="2" opacity="0.9" 
+                     [attr.transform]="'rotate(144 ' + node.x + ' ' + node.y + ')'"/>
+            <!-- Petal 4 (bottom-left) -->
+            <ellipse [attr.cx]="node.x - 14" [attr.cy]="node.y + 20" [attr.rx]="12" [attr.ry]="18" 
+                     fill="#FFB6C1" stroke="#FF69B4" stroke-width="2" opacity="0.9" 
+                     [attr.transform]="'rotate(216 ' + node.x + ' ' + node.y + ')'"/>
+            <!-- Petal 5 (top-left) -->
+            <ellipse [attr.cx]="node.x - 22" [attr.cy]="node.y - 12" [attr.rx]="12" [attr.ry]="18" 
+                     fill="#FFB6C1" stroke="#FF69B4" stroke-width="2" opacity="0.9" 
+                     [attr.transform]="'rotate(288 ' + node.x + ' ' + node.y + ')'"/>
+          </g>
+          
+          <!-- Center circle for regular prophets (flowers) -->
           <circle 
+            *ngIf="node.prophet.id !== 1 && node.prophet.id !== 6 && node.prophet.id !== 3 && node.prophet.id !== 15 && node.prophet.id !== 24 && node.prophet.id !== 25"
             [attr.cx]="node.x" 
             [attr.cy]="node.y" 
             [attr.r]="NODE_RADIUS"
-            [attr.fill]="getNodeColor(node.prophet)"
-            stroke="#fff"
+            fill="#FFA500"
+            stroke="#FF1493"
             stroke-width="3"
-            class="node-circle"
-            filter="url(#glow)">
+            class="node-circle">
           </circle>
           
-          <!-- Prophet name -->
+          <!-- Adam's center circle -->
+          <circle 
+            *ngIf="node.prophet.id === 1"
+            [attr.cx]="node.x" 
+            [attr.cy]="node.y" 
+            [attr.r]="NODE_RADIUS"
+            fill="#D2691E"
+            stroke="#8B4513"
+            stroke-width="4"
+            class="node-circle adam-node">
+          </circle>
+          
+          <!-- Abraham's center circle -->
+          <circle 
+            *ngIf="node.prophet.id === 6"
+            [attr.cx]="node.x" 
+            [attr.cy]="node.y" 
+            [attr.r]="NODE_RADIUS"
+            fill="#DDA0DD"
+            stroke="#9370DB"
+            stroke-width="4"
+            class="node-circle abraham-node">
+          </circle>
+          
+          <!-- Noah's center circle -->
+          <circle 
+            *ngIf="node.prophet.id === 3"
+            [attr.cx]="node.x" 
+            [attr.cy]="node.y" 
+            [attr.r]="NODE_RADIUS"
+            fill="#87CEEB"
+            stroke="#4169E1"
+            stroke-width="4"
+            class="node-circle noah-node">
+          </circle>
+          
+          <!-- Moses' center circle -->
+          <circle 
+            *ngIf="node.prophet.id === 15"
+            [attr.cx]="node.x" 
+            [attr.cy]="node.y" 
+            [attr.r]="NODE_RADIUS"
+            fill="#F0E68C"
+            stroke="#DAA520"
+            stroke-width="4"
+            class="node-circle moses-node">
+          </circle>
+          
+          <!-- Jesus' center circle -->
+          <circle 
+            *ngIf="node.prophet.id === 24"
+            [attr.cx]="node.x" 
+            [attr.cy]="node.y" 
+            [attr.r]="NODE_RADIUS"
+            fill="#E6E6FA"
+            stroke="#87CEEB"
+            stroke-width="4"
+            class="node-circle jesus-node">
+          </circle>
+          
+          <!-- Muhammad's center circle -->
+          <circle 
+            *ngIf="node.prophet.id === 25"
+            [attr.cx]="node.x" 
+            [attr.cy]="node.y" 
+            [attr.r]="NODE_RADIUS + 5"
+            fill="#FFD700"
+            stroke="#FF8C00"
+            stroke-width="5"
+            class="node-circle muhammad-node">
+          </circle>
+          
+          <!-- Enhanced design for Muhammad ﷺ (The Sun) -->
+          <g *ngIf="node.prophet.id === 25" class="muhammad-design">
+            <!-- Outer sun rays (long) -->
+            <g class="sun-rays-outer">
+              <line *ngFor="let angle of [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330]"
+                    [attr.x1]="node.x + Math.cos(angle * Math.PI / 180) * 55"
+                    [attr.y1]="node.y + Math.sin(angle * Math.PI / 180) * 55"
+                    [attr.x2]="node.x + Math.cos(angle * Math.PI / 180) * 85"
+                    [attr.y2]="node.y + Math.sin(angle * Math.PI / 180) * 85"
+                    stroke="#FFD700"
+                    stroke-width="5"
+                    stroke-linecap="round"
+                    opacity="0.9">
+              </line>
+            </g>
+            <!-- Inner sun rays (short) -->
+            <g class="sun-rays-inner">
+              <line *ngFor="let angle of [15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345]"
+                    [attr.x1]="node.x + Math.cos(angle * Math.PI / 180) * 50"
+                    [attr.y1]="node.y + Math.sin(angle * Math.PI / 180) * 50"
+                    [attr.x2]="node.x + Math.cos(angle * Math.PI / 180) * 65"
+                    [attr.y2]="node.y + Math.sin(angle * Math.PI / 180) * 65"
+                    stroke="#FFA500"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                    opacity="0.8">
+              </line>
+            </g>
+            <!-- Outer glow circle -->
+            <circle [attr.cx]="node.x" [attr.cy]="node.y" [attr.r]="48" 
+                    fill="#FFD700" opacity="0.3"/>
+            <!-- Middle circle -->
+            <circle [attr.cx]="node.x" [attr.cy]="node.y" [attr.r]="42" 
+                    fill="#FFA500" stroke="#FF8C00" stroke-width="3" opacity="0.9"/>
+          </g>
+          
+          <!-- Prophet name in center of circle -->
           <text 
             [attr.x]="node.x" 
-            [attr.y]="node.y - NODE_RADIUS - 15"
+            [attr.y]="node.y + 5"
             text-anchor="middle"
             class="node-name"
-            fill="#2C3E50"
-            font-size="14"
-            font-weight="600">
+            fill="#000000"
+            font-size="12"
+            font-weight="700">
             {{ getProphetName(node.prophet) }}
           </text>
           
-          <!-- Special marker for Muhammad ﷺ -->
+          <!-- Special marker for Muhammad ﷺ below name -->
           <text 
             *ngIf="node.prophet.id === 25"
             [attr.x]="node.x" 
-            [attr.y]="node.y + 5"
+            [attr.y]="node.y + 50"
             text-anchor="middle"
-            class="node-icon"
-            fill="#fff"
-            font-size="24"
+            class="prophet-symbol"
+            fill="#8B4513"
+            font-size="18"
             font-weight="bold">
             ﷺ
-          </text>
-          
-          <!-- Icon for other prophets -->
-          <text 
-            *ngIf="node.prophet.id !== 25"
-            [attr.x]="node.x" 
-            [attr.y]="node.y + 5"
-            text-anchor="middle"
-            class="node-icon"
-            fill="#fff"
-            font-size="20">
-            ★
           </text>
         </g>
       </g>
     </svg>
   </div>
 
-  <!-- Hover Info Card -->
-  <div 
-    *ngIf="hoveredProphet" 
-    class="hover-card"
-    [style.left.px]="hoverX + 20"
-    [style.top.px]="hoverY - 50">
-    <div class="hover-card-content">
-      <h3 class="hover-name">
-        {{ hoveredProphet.name }}
-        <span class="hover-arabic">{{ hoveredProphet.arabicName }}</span>
-      </h3>
-      <p class="hover-era">
-        <strong>Era:</strong> {{ hoveredProphet.era }}
-      </p>
-      <p class="hover-location" *ngIf="hoveredProphet.locationSent">
-        <strong>Location:</strong> {{ hoveredProphet.locationSent }}
-      </p>
-      <p class="hover-hint">Click for more details</p>
-    </div>
-  </div>
+  <!-- Removed hover card - nodes stay stable on hover -->
 
   <!-- Detailed Modal -->
   <div *ngIf="showModal && selectedProphet" class="modal-overlay" (click)="closeModal()">
@@ -215,9 +386,13 @@
             <span class="icon">📗</span> Quranic References
           </h3>
           <div class="quran-refs">
-            <span *ngFor="let ref of selectedProphet.resources?.quranRefs!" class="quran-ref">
+            <a *ngFor="let ref of selectedProphet.resources?.quranRefs!" 
+               [href]="getQuranLink(ref)" 
+               target="_blank"
+               class="quran-ref quran-link">
               {{ ref }}
-            </span>
+              <span class="external-link-icon">🔗</span>
+            </a>
           </div>
         </section>
 
@@ -254,7 +429,7 @@
             </div>
           </div>
         </section>
-      </div>
+  </div>
 
       <div class="modal-footer">
         <button class="btn-youtube" (click)="openYouTube(selectedProphet)">
@@ -263,34 +438,7 @@
         <button class="btn-close-modal" (click)="closeModal()">
           Close
         </button>
-      </div>
     </div>
-  </div>
-
-  <!-- Legend -->
-  <div class="legend">
-    <h3>Lineage Colors</h3>
-    <div class="legend-items">
-      <div class="legend-item">
-        <span class="legend-color" style="background: #8B4513;"></span>
-        <span>Adam (Father of Humanity)</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-color" style="background: #2ECC71;"></span>
-        <span>Ishmael's Lineage (Arab Prophets)</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-color" style="background: #3498DB;"></span>
-        <span>Isaac's Lineage (Bani Israel)</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-color" style="background: #9B59B6;"></span>
-        <span>Direct Descendants of Noah</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-color" style="background: #FFD700;"></span>
-        <span>Muhammad ﷺ (Seal of Prophets)</span>
-      </div>
     </div>
   </div>
 </div>

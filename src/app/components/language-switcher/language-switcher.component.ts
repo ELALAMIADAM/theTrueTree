@@ -30,18 +30,19 @@ import { TranslationService } from '../../services/translation.service';
       display: flex;
       gap: 8px;
       z-index: 1000;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(30, 30, 30, 0.95);
       padding: 8px;
       border-radius: 25px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
       backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 215, 0, 0.3);
     }
 
     .lang-btn {
       padding: 10px 20px;
-      border: 2px solid transparent;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      background: rgba(0, 0, 0, 0.5);
+      color: #FFFFFF;
       border-radius: 20px;
       cursor: pointer;
       font-weight: 600;
@@ -53,13 +54,17 @@ import { TranslationService } from '../../services/translation.service';
     .lang-btn:hover {
       opacity: 0.8;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+      border-color: rgba(255, 215, 0, 0.5);
     }
 
     .lang-btn.active {
       opacity: 1;
       transform: scale(1.05);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      background: #FFD700;
+      color: #000000;
+      border-color: #FFD700;
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
     }
 
     @media (max-width: 768px) {

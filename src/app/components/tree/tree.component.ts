@@ -40,9 +40,14 @@ export class TreeComponent implements OnInit {
   height: number = 0;
   
   // Layout configuration
-  readonly LEVEL_HEIGHT = 150;
-  readonly NODE_RADIUS = 40;
-  readonly HORIZONTAL_SPACING = 120;
+  readonly LEVEL_HEIGHT = 100;
+  readonly NODE_RADIUS = 35;
+  readonly HORIZONTAL_SPACING = 100;
+  readonly TRUNK_WIDTH = 80;
+  readonly TRUNK_START_X = 0; // Will be calculated as center
+  
+  // Expose Math to template
+  Math = Math;
 
   constructor(
     private prophetService: ProphetService,
@@ -67,30 +72,77 @@ export class TreeComponent implements OnInit {
   }
 
   /**
-   * Calculate tree layout - bottom to top (Adam at bottom, Muhammad at top)
+   * Calculate tree layout - organic tree style like traditional Islamic art
+   * Muhammad (ﷺ) at the top as a sun/flower
    */
   calculateLayout(): void {
-    this.width = Math.max(window.innerWidth - 100, 1200);
+    this.width = Math.max(window.innerWidth - 100, 1600);
     
-    // Organize prophets by level (generation)
-    const levels = this.organizeProphetsIntoLevels();
-    this.height = levels.length * this.LEVEL_HEIGHT + 200;
+    // Organize prophets by era
+    const levels = this.organizeProphetsByEra();
+    this.height = levels.length * this.LEVEL_HEIGHT + 400;
     
-    // Position each prophet
+    const centerX = this.width / 2;
+    
+    // Position each prophet in organic tree layout
     this.treeNodes = [];
     levels.forEach((levelProphets, levelIndex) => {
-      const y = this.height - (levelIndex * this.LEVEL_HEIGHT) - 100; // Bottom to top
-      const totalWidth = levelProphets.length * this.HORIZONTAL_SPACING;
-      const startX = (this.width - totalWidth) / 2;
+      const y = this.height - (levelIndex * this.LEVEL_HEIGHT) - 150; // Bottom to top
       
-      levelProphets.forEach((prophet, index) => {
+      // Special positioning for Muhammad (ﷺ) at the very top
+      const muhammadIndex = levelProphets.findIndex(p => p.id === 25);
+      let otherProphets = levelProphets;
+      
+      if (muhammadIndex !== -1) {
+        // Muhammad as the sun/top flower
+        const muhammad = levelProphets[muhammadIndex];
         this.treeNodes.push({
-          prophet,
-          x: startX + (index * this.HORIZONTAL_SPACING) + this.HORIZONTAL_SPACING / 2,
-          y: y,
+          prophet: muhammad,
+          x: this.width - 250, // Top right like a sun
+          y: 100,
           level: levelIndex
         });
-      });
+        otherProphets = levelProphets.filter(p => p.id !== 25);
+      }
+      
+      // Position other prophets in organic branch pattern
+      if (otherProphets.length > 0) {
+        if (levelIndex === 0) {
+          // Adam at the base (trunk)
+          otherProphets.forEach(prophet => {
+            this.treeNodes.push({
+              prophet,
+              x: centerX,
+              y: y,
+              level: levelIndex
+            });
+          });
+        } else {
+          // Arrange in branches - alternating left and right
+          const spreadFactor = Math.min(levelIndex * 60, 300);
+          
+          otherProphets.forEach((prophet, index) => {
+            let xOffset = 0;
+            
+            if (otherProphets.length === 1) {
+              xOffset = 0;
+            } else if (otherProphets.length === 2) {
+              xOffset = index === 0 ? -spreadFactor : spreadFactor;
+            } else {
+              // Distribute across the width
+              const step = (spreadFactor * 2) / (otherProphets.length - 1);
+              xOffset = -spreadFactor + (index * step);
+            }
+            
+            this.treeNodes.push({
+              prophet,
+              x: centerX + xOffset,
+              y: y,
+              level: levelIndex
+            });
+          });
+        }
+      }
     });
     
     // Create links
@@ -98,71 +150,35 @@ export class TreeComponent implements OnInit {
   }
 
   /**
-   * Organize prophets into levels based on their relationships
+   * Organize prophets by era (chronological order)
+   * Separate Jacob's children from Muhammad's branch
    */
-  organizeProphetsIntoLevels(): Prophet[][] {
-    const levels: Prophet[][] = [];
-    const visited = new Set<number>();
+  organizeProphetsByEra(): Prophet[][] {
+    // Define era-based groupings (bottom to top)
+    const eraGroups = [
+      [1], // Level 0: Adam
+      [2, 3], // Level 1: Idris, Noah
+      [4, 6, 5], // Level 2: Hud, Saleh, Abraham
+      [12, 7, 9, 8], // Level 3: Lot, Ishmael, Isaac, Shuayb
+      [13, 10, 14], // Level 4: Jacob, Job, Dhul-Kifl
+      [11], // Level 5: Joseph (Jacob's son)
+      [15, 16], // Level 6: Moses, Aaron
+      [17], // Level 7: David
+      [18], // Level 8: Solomon
+      [19, 20], // Level 9: Elijah, Elisha
+      [21], // Level 10: Jonah
+      [22], // Level 11: Zechariah
+      [23, 24], // Level 12: John, Jesus
+      [25] // Level 13: Muhammad ﷺ (top-left)
+    ];
+    
     const prophetMap = new Map(this.prophets.map(p => [p.id, p]));
+    const levels: Prophet[][] = [];
     
-    // BFS to organize into levels
-    const queue: { prophet: Prophet, level: number }[] = [];
-    
-    // Start with Adam (id: 1)
-    const adam = prophetMap.get(1);
-    if (adam) {
-      queue.push({ prophet: adam, level: 0 });
-      visited.add(adam.id);
-    }
-    
-    while (queue.length > 0) {
-      const { prophet, level } = queue.shift()!;
-      
-      // Add to level
-      if (!levels[level]) {
-        levels[level] = [];
-      }
-      levels[level].push(prophet);
-      
-      // Find descendants
-      const descendants = this.relationships
-        .filter(r => r.from === prophet.id && (r.type === 'descendant' || r.type === 'lineage'))
-        .map(r => prophetMap.get(r.to))
-        .filter((p): p is Prophet => p !== undefined && !visited.has(p.id));
-      
-      descendants.forEach(desc => {
-        visited.add(desc.id);
-        queue.push({ prophet: desc, level: level + 1 });
-      });
-    }
-    
-    // Add any remaining prophets (those not in main tree)
-    this.prophets.forEach(p => {
-      if (!visited.has(p.id)) {
-        // Try to find their appropriate level based on era
-        let targetLevel = 0;
-        const ancestors = this.relationships
-          .filter(r => r.to === p.id)
-          .map(r => prophetMap.get(r.from))
-          .filter((a): a is Prophet => a !== undefined);
-        
-        if (ancestors.length > 0) {
-          // Find the highest level of ancestors
-          ancestors.forEach(ancestor => {
-            for (let i = 0; i < levels.length; i++) {
-              if (levels[i].includes(ancestor)) {
-                targetLevel = Math.max(targetLevel, i + 1);
-              }
-            }
-          });
-        }
-        
-        if (!levels[targetLevel]) {
-          levels[targetLevel] = [];
-        }
-        levels[targetLevel].push(p);
-        visited.add(p.id);
-      }
+    eraGroups.forEach((group, index) => {
+      levels[index] = group
+        .map(id => prophetMap.get(id))
+        .filter((p): p is Prophet => p !== undefined);
     });
     
     return levels;
@@ -186,41 +202,51 @@ export class TreeComponent implements OnInit {
   }
 
   /**
-   * Get SVG path for link
+   * Get SVG path for link - organic branch style
    */
   getLinkPath(link: TreeLink): string {
     const { from, to } = link;
     
-    // Cubic bezier curve from bottom to top
-    const midY = (from.y + to.y) / 2;
+    // Create organic curved branches
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    
+    // Control points for natural branch curve
+    const cp1x = from.x + dx * 0.2;
+    const cp1y = from.y + dy * 0.3;
+    const cp2x = to.x - dx * 0.2;
+    const cp2y = to.y - dy * 0.7;
     
     return `M ${from.x},${from.y} 
-            C ${from.x},${midY} 
-              ${to.x},${midY} 
+            C ${cp1x},${cp1y} 
+              ${cp2x},${cp2y} 
               ${to.x},${to.y}`;
+  }
+  
+  /**
+   * Get trunk path for tree base
+   */
+  getTrunkPath(): string {
+    const centerX = this.width / 2;
+    const trunkBottom = this.height - 100;
+    const trunkTop = this.height - 300;
+    const trunkWidth = this.TRUNK_WIDTH;
+    
+    return `M ${centerX - trunkWidth/2},${trunkBottom}
+            L ${centerX - trunkWidth/3},${trunkTop}
+            L ${centerX + trunkWidth/3},${trunkTop}
+            L ${centerX + trunkWidth/2},${trunkBottom} Z`;
   }
 
   /**
-   * Get prophet node color based on lineage
+   * Get prophet node color - flower centers
    */
   getNodeColor(prophet: Prophet): string {
-    // Color coding by lineage
-    if (prophet.id === 1) return '#8B4513'; // Adam - brown
-    if (prophet.id === 25) return '#FFD700'; // Muhammad - gold
+    // Gold/yellow for Muhammad ﷺ (like the sun)
+    if (prophet.id === 25) return '#FFD700';
     
-    // Ishmael's line (Arab prophets) - Green shades
-    const ishmaelLineage = [8, 25];
-    if (ishmaelLineage.includes(prophet.id)) return '#2ECC71';
-    
-    // Isaac's line (Bani Israel) - Blue shades
-    const isaacLineage = [9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
-    if (isaacLineage.includes(prophet.id)) return '#3498DB';
-    
-    // Direct descendants of Noah
-    const noahDescendants = [3, 4, 5, 6, 7, 12];
-    if (noahDescendants.includes(prophet.id)) return '#9B59B6';
-    
-    return '#95A5A6'; // Default gray
+    // Yellow/orange centers for flower nodes
+    return '#FFA500';
   }
 
   /**
@@ -228,8 +254,7 @@ export class TreeComponent implements OnInit {
    */
   onProphetHover(event: MouseEvent, prophet: Prophet): void {
     this.hoveredProphet = prophet;
-    this.hoverX = event.clientX;
-    this.hoverY = event.clientY;
+    // Fixed position for hover card - no movement
   }
 
   /**
@@ -269,5 +294,52 @@ export class TreeComponent implements OnInit {
   openYouTube(prophet: Prophet): void {
     const query = encodeURIComponent(`Prophet ${prophet.name} story Islam`);
     window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank');
+  }
+
+  /**
+   * Generate star path for special prophets
+   */
+  getStarPath(cx: number, cy: number, outerRadius: number, innerRadius: number, points: number): string {
+    let path = '';
+    const angleStep = (Math.PI * 2) / points;
+    
+    for (let i = 0; i < points * 2; i++) {
+      const radius = i % 2 === 0 ? outerRadius : innerRadius;
+      const angle = (i * angleStep / 2) - Math.PI / 2;
+      const x = cx + radius * Math.cos(angle);
+      const y = cy + radius * Math.sin(angle);
+      
+      if (i === 0) {
+        path = `M ${x} ${y}`;
+      } else {
+        path += ` L ${x} ${y}`;
+      }
+    }
+    
+    path += ' Z';
+    return path;
+  }
+
+  /**
+   * Generate Quran.com link from verse reference
+   * Format: "2:30-39" or "11:71" -> https://quran.com/fr/2?startingVerse=30
+   */
+  getQuranLink(reference: string): string {
+    // Remove any extra text and get the verse reference
+    const match = reference.match(/(\d+):(\d+)(-\d+)?/);
+    
+    if (match) {
+      const surah = match[1];
+      const verse = match[2];
+      return `https://quran.com/fr/${surah}?startingVerse=${verse}`;
+    }
+    
+    // Fallback to just the surah if no verse number
+    const surahMatch = reference.match(/(\d+)/);
+    if (surahMatch) {
+      return `https://quran.com/fr/${surahMatch[1]}`;
+    }
+    
+    return 'https://quran.com/fr';
   }
 }

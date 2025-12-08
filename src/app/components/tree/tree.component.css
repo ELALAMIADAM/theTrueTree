@@ -2,7 +2,11 @@
 .tree-wrapper {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(to bottom, 
+    #87CEEB 0%,
+    #B0E0E6 30%,
+    #F0E68C 70%,
+    #DEB887 100%);
   padding: 20px;
   overflow-x: auto;
   position: relative;
@@ -13,19 +17,19 @@
   text-align: center;
   margin-bottom: 30px;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, #F5DEB3 0%, #DEB887 100%);
   border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.3);
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  border: 4px solid #8B4513;
 }
 
 .tree-title {
   font-size: 2.5rem;
   margin: 0 0 10px 0;
-  color: #2C3E50;
+  color: #8B4513;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -33,16 +37,15 @@
 
 .title-english {
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #654321;
+  text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
 }
 
 .title-arabic {
   font-size: 2rem;
   font-family: 'Traditional Arabic', 'Arial', sans-serif;
-  color: #2ECC71;
+  color: #8B4513;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .tree-subtitle {
@@ -54,18 +57,28 @@
 
 /* Canvas Wrapper */
 .tree-canvas-wrapper {
-  background: rgba(255, 255, 255, 0.98);
+  background: linear-gradient(to bottom, 
+    #87CEEB 0%,
+    #B0E0E6 30%,
+    #F5DEB3 70%,
+    #D2B48C 100%);
   border-radius: 20px;
   padding: 40px 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   overflow-x: auto;
   margin-bottom: 30px;
+  border: 8px solid #8B4513;
 }
 
 .tree-canvas {
   display: block;
   margin: 0 auto;
-  background: #fff;
+  background: linear-gradient(to bottom, 
+    #87CEEB 0%,
+    #ADD8E6 20%,
+    #F0E68C 60%,
+    #DEB887 80%,
+    #D2691E 100%);
   border-radius: 10px;
 }
 
@@ -74,107 +87,101 @@
   transition: all 0.3s ease;
 }
 
+/* No movement on hover - nodes stay stable */
 .prophet-node:hover .node-circle {
-  transform: scale(1.1);
-  filter: url(#glow) drop-shadow(0 0 20px currentColor);
-}
-
-.prophet-node:hover .node-glow {
-  opacity: 0.5 !important;
-  animation: pulse 1.5s ease-in-out infinite;
+  filter: brightness(1.2);
 }
 
 .prophet-node.selected .node-circle {
   stroke-width: 5;
-  stroke: #FFD700;
 }
 
 .node-circle {
-  transition: all 0.3s ease;
+  transition: filter 0.3s ease;
   cursor: pointer;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* Enhanced Muhammad design (The Sun) */
+.muhammad-node {
+  filter: drop-shadow(0 0 40px #FFD700) drop-shadow(0 0 80px #FFA500);
+  animation: muhammadPulse 3s ease-in-out infinite;
+}
+
+.muhammad-design .sun-rays-outer line {
+  animation: rayPulseOuter 2s ease-in-out infinite;
+}
+
+.muhammad-design .sun-rays-inner line {
+  animation: rayPulseInner 2s ease-in-out infinite 0.5s;
+}
+
+/* Special styling for Adam (Father of Humanity) */
+.adam-node {
+  filter: drop-shadow(0 0 20px #8B4513) drop-shadow(0 0 40px #654321);
+  animation: adamPulse 4s ease-in-out infinite;
+}
+
+/* Special styling for Abraham (Father of Prophets) */
+.abraham-node {
+  filter: drop-shadow(0 0 20px #9370DB) drop-shadow(0 0 35px #BA55D3);
+  animation: abrahamPulse 3.5s ease-in-out infinite;
+}
+
+/* Special styling for Noah (Ark Builder) */
+.noah-node {
+  filter: drop-shadow(0 0 20px #4169E1) drop-shadow(0 0 35px #87CEEB);
+  animation: noahPulse 3.5s ease-in-out infinite;
+}
+
+/* Special styling for Moses (Torah) */
+.moses-node {
+  filter: drop-shadow(0 0 20px #DAA520) drop-shadow(0 0 35px #F0E68C);
+  animation: mosesPulse 3.5s ease-in-out infinite;
+}
+
+/* Special styling for Jesus (Light) */
+.jesus-node {
+  filter: drop-shadow(0 0 25px #87CEEB) drop-shadow(0 0 40px #E6E6FA);
+  animation: jesusPulse 3s ease-in-out infinite;
 }
 
 .node-name {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   transition: all 0.3s ease;
   pointer-events: none;
-}
-
-.prophet-node:hover .node-name {
-  font-size: 16px;
+  fill: #000000 !important;
   font-weight: 700;
+  font-size: 13px;
 }
 
 .node-icon {
   pointer-events: none;
   transition: all 0.3s ease;
+  fill: #000000 !important;
 }
 
-.prophet-node:hover .node-icon {
-  transform: scale(1.2);
+/* Tree Trunk */
+.tree-trunk {
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
 }
 
-/* Links */
+/* Links (Branches) */
 .prophet-link {
   transition: all 0.3s ease;
+  stroke: #8B4513 !important;
+  stroke-width: 3;
+  opacity: 0.8;
 }
 
 .prophet-link.highlighted {
-  stroke-width: 4 !important;
+  stroke-width: 5 !important;
   opacity: 1 !important;
-  filter: drop-shadow(0 0 5px rgba(52, 152, 219, 0.5));
+  stroke: #A0522D !important;
+  filter: drop-shadow(0 0 5px rgba(139, 69, 19, 0.8));
 }
 
-/* Hover Card */
-.hover-card {
-  position: fixed;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 15px 20px;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  pointer-events: none;
-  min-width: 250px;
-  animation: fadeIn 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.hover-card-content {
-  position: relative;
-}
-
-.hover-name {
-  margin: 0 0 10px 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.hover-arabic {
-  font-size: 1.1rem;
-  opacity: 0.9;
-  font-family: 'Traditional Arabic', sans-serif;
-}
-
-.hover-era,
-.hover-location {
-  margin: 5px 0;
-  font-size: 0.95rem;
-  opacity: 0.95;
-}
-
-.hover-hint {
-  margin: 10px 0 0 0;
-  font-size: 0.85rem;
-  opacity: 0.7;
-  font-style: italic;
-  text-align: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
-  padding-top: 8px;
-}
+/* Hover Card - Removed */
 
 /* Modal Overlay */
 .modal-overlay {
@@ -183,7 +190,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.95);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -191,19 +198,20 @@
   padding: 20px;
   animation: fadeIn 0.3s ease;
   overflow-y: auto;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
 }
 
 .modal-content {
-  background: white;
+  background: #1a1a1a;
   border-radius: 20px;
   max-width: 800px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 25px 100px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 100px rgba(255, 215, 0, 0.3);
   animation: slideUp 0.4s ease;
   position: relative;
+  border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
 .modal-close {
@@ -232,10 +240,11 @@
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
   color: white;
   padding: 40px 30px 30px 30px;
   border-radius: 20px 20px 0 0;
+  border-bottom: 2px solid rgba(255, 215, 0, 0.3);
 }
 
 .modal-title {
@@ -285,10 +294,10 @@
   align-items: center;
   gap: 10px;
   font-size: 1.4rem;
-  color: #2C3E50;
+  color: #FFD700;
   margin: 0 0 15px 0;
   padding-bottom: 10px;
-  border-bottom: 2px solid #ECF0F1;
+  border-bottom: 2px solid rgba(255, 215, 0, 0.3);
 }
 
 .icon {
@@ -299,7 +308,7 @@
 .scripture-text {
   font-size: 1.05rem;
   line-height: 1.8;
-  color: #34495E;
+  color: #CCCCCC;
   text-align: justify;
 }
 
@@ -314,12 +323,12 @@
 .miracles-list li {
   padding: 12px 15px;
   margin-bottom: 10px;
-  background: linear-gradient(135deg, #E8F5E9 0%, #E3F2FD 100%);
-  border-left: 4px solid #2ECC71;
+  background: rgba(255, 215, 0, 0.1);
+  border-left: 4px solid #FFD700;
   border-radius: 8px;
   font-size: 1rem;
   line-height: 1.6;
-  color: #2C3E50;
+  color: #FFFFFF;
   transition: all 0.3s ease;
 }
 
@@ -330,8 +339,8 @@
 }
 
 .miracles-list li {
-  background: linear-gradient(135deg, #FFF9C4 0%, #FFE0B2 100%);
-  border-left-color: #FFA726;
+  background: rgba(255, 215, 0, 0.15);
+  border-left-color: #FFD700;
 }
 
 .quran-refs {
@@ -350,11 +359,45 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: default;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .quran-ref:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Clickable Quran links */
+.quran-link {
+  cursor: pointer;
+  text-decoration: none;
+  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+  color: white;
+  border: 2px solid #2E7D32;
+}
+
+.quran-link:hover {
+  background: linear-gradient(135deg, #66BB6A 0%, #81C784 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  border-color: #1B5E20;
+}
+
+.quran-link:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.external-link-icon {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.quran-link:hover .external-link-icon {
+  opacity: 1;
+  transform: translateX(2px);
 }
 
 .resources-list {
@@ -488,19 +531,21 @@
 
 /* Legend */
 .legend {
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(135deg, #F5DEB3 0%, #DEB887 100%);
   padding: 20px;
   border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.3);
   max-width: 600px;
   margin: 0 auto;
+  border: 4px solid #8B4513;
 }
 
 .legend h3 {
   margin: 0 0 15px 0;
   font-size: 1.3rem;
-  color: #2C3E50;
+  color: #654321;
   text-align: center;
+  font-weight: 700;
 }
 
 .legend-items {
@@ -514,15 +559,16 @@
   align-items: center;
   gap: 12px;
   font-size: 0.95rem;
-  color: #34495E;
+  color: #654321;
+  font-weight: 600;
 }
 
 .legend-color {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 2px solid white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid #8B4513;
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
 }
 
 /* Animations */
@@ -554,6 +600,82 @@
   50% {
     transform: scale(1.2);
     opacity: 0.5;
+  }
+}
+
+@keyframes muhammadPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 40px #FFD700) drop-shadow(0 0 80px #FFA500);
+  }
+  50% {
+    filter: drop-shadow(0 0 60px #FFD700) drop-shadow(0 0 100px #FFA500) drop-shadow(0 0 120px #FF8C00);
+  }
+}
+
+@keyframes rayPulseOuter {
+  0%, 100% {
+    opacity: 0.7;
+    stroke-width: 5;
+  }
+  50% {
+    opacity: 1;
+    stroke-width: 6;
+  }
+}
+
+@keyframes rayPulseInner {
+  0%, 100% {
+    opacity: 0.6;
+    stroke-width: 4;
+  }
+  50% {
+    opacity: 0.9;
+    stroke-width: 5;
+  }
+}
+
+@keyframes adamPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px #8B4513) drop-shadow(0 0 40px #654321);
+  }
+  50% {
+    filter: drop-shadow(0 0 30px #8B4513) drop-shadow(0 0 50px #654321) drop-shadow(0 0 60px #A0522D);
+  }
+}
+
+@keyframes abrahamPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px #9370DB) drop-shadow(0 0 35px #BA55D3);
+  }
+  50% {
+    filter: drop-shadow(0 0 30px #9370DB) drop-shadow(0 0 50px #BA55D3);
+  }
+}
+
+@keyframes noahPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px #4169E1) drop-shadow(0 0 35px #87CEEB);
+  }
+  50% {
+    filter: drop-shadow(0 0 30px #4169E1) drop-shadow(0 0 50px #87CEEB);
+  }
+}
+
+@keyframes mosesPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px #DAA520) drop-shadow(0 0 35px #F0E68C);
+  }
+  50% {
+    filter: drop-shadow(0 0 30px #DAA520) drop-shadow(0 0 50px #F0E68C);
+  }
+}
+
+@keyframes jesusPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 25px #87CEEB) drop-shadow(0 0 40px #E6E6FA);
+  }
+  50% {
+    filter: drop-shadow(0 0 35px #87CEEB) drop-shadow(0 0 55px #E6E6FA);
   }
 }
 
