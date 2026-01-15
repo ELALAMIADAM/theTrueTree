@@ -603,7 +603,7 @@ export class ProphetService {
       { from: 3, to: 6, type: 'descendant' },
       
       // From Abraham
-      { from: 6, to: 7, type: 'contemporary' }, // Lot was nephew
+      { from: 3, to: 7, type: 'descendant' }, // Lot was nephew
       { from: 6, to: 8, type: 'descendant' },    // Ishmael
       { from: 6, to: 9, type: 'descendant' },    // Isaac
       { from: 6, to: 12, type: 'descendant' },   // Shuayb (some traditions)
@@ -617,7 +617,7 @@ export class ProphetService {
       
       // Jacob's line (Bani Israel)
       { from: 10, to: 11, type: 'descendant' },  // Jacob to Joseph
-      { from: 10, to: 14, type: 'descendant' },  // To Dhul-Kifl
+      { from: 10, to: 14, type: 'contemporary' },  // To Dhul-Kifl
       { from: 10, to: 15, type: 'descendant' },  // To Moses
       { from: 10, to: 16, type: 'descendant' },  // To Aaron
       { from: 10, to: 17, type: 'descendant' },  // To David

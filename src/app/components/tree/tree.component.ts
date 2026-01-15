@@ -158,8 +158,8 @@ export class TreeComponent implements OnInit {
     const eraGroups = [
       [1], // Level 0: Adam
       [2, 3], // Level 1: Idris, Noah
-      [4, 6, 5], // Level 2: Hud, Saleh, Abraham
-      [12, 7, 9, 8], // Level 3: Lot, Ishmael, Isaac, Shuayb
+      [4, 6, 5, 7], // Level 2: Hud, Abraham, Saleh, Lot
+      [12, 9, 8], // Level 3:  Ishmael, Isaac, Shuayb
       [13, 10, 14], // Level 4: Jacob, Job, Dhul-Kifl
       [11], // Level 5: Joseph (Jacob's son)
       [15, 16], // Level 6: Moses, Aaron
